@@ -45,4 +45,17 @@ void File-descriptor-test() {
 	pid_t childPID;
 
 	childPID = fork();
+
+	if (childPID >= 0){ //successful fork
+		if(childPID == 0){ //child process
+			
+		}
+		else { //parent process
+			
+		}
+	}
+	else { //unsuccessful fork
+		printf("Fork failed\n");
+		return 1;
+	}
 }
