@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <string.h>
 #include <errno.h>
@@ -12,7 +13,8 @@ void Fork-variable-test();
 void File-descriptor-test();
 
 int main(){
-
+	Fork-variable-test();
+	File-descriptor-test();
 	return 0;
 }
 
@@ -43,15 +45,17 @@ void Fork-variable-test() {
 
 void File-descriptor-test() {
 	pid_t childPID;
+	int filedesc;
 
+	fildesc = open("file", )
 	childPID = fork();
 
 	if (childPID >= 0){ //successful fork
 		if(childPID == 0){ //child process
-			
+
 		}
 		else { //parent process
-			
+
 		}
 	}
 	else { //unsuccessful fork
