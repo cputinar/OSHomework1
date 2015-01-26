@@ -1,25 +1,27 @@
+#include <unistd.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <stdlib.h>
 #include <sys/wait.h>
+#include <signal.h>
+#include <errno.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <fcntl.h>
 #include <string.h>
-#include <errno.h>
 
 
 //Fork-variable-test: 
 //File-descriptor-test:  
-void Fork-variable-test();
-void File-descriptor-test();
+int Fork_Variable_Test();
 
 int main(){
-	Fork-variable-test();
-	File-descriptor-test();
+	Fork_Variable_Test();
+	//File-descriptor-test();
 	return 0;
 }
 
 
-void Fork-variable-test() {
+int Fork_Variable_Test() {
 	pid_t childPID;	
 	int var = 10;
 
@@ -43,7 +45,7 @@ void Fork-variable-test() {
 	}
 }
 
-void File-descriptor-test() {
+/*void File-descriptor-test() {
 	pid_t childPID;
 	int filedesc;
 
@@ -62,4 +64,4 @@ void File-descriptor-test() {
 		printf("Fork failed\n");
 		return 1;
 	}
-}
+}*/
