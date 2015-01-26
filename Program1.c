@@ -8,15 +8,8 @@
 // Print out odd lines and then even lines
 
 //Can use the following commands: open, lseek, read, close
-int Odds_then-evens(int argc, const char *argv[]);
 
-int main(){
-	Odds_then-evens(int argc, const char *argv[]);
-}
-
-
-int Odds_then-evens(int argc, const char *argv[]){
-
+int main(int argc, const char *argv[]){
 	char buffer[2048];
 	int lineNum=0;
 	int i, j;
@@ -97,3 +90,4 @@ int Odds_then-evens(int argc, const char *argv[]){
 
 	exit(EXIT_SUCCESS);
 }
+
