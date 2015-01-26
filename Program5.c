@@ -18,29 +18,34 @@ int main(int argc, char *argv[]){
 
 void dfs(char *path, char *target){
 	struct dirent *d;
+	struct stat statbuf;
 	DIR *dp;
 	dp = opendir(path);
 	indents++;
-	if(!dp)
+	if(!dp){
+		printf("Bad dir: %s\n", path);
 		return;
+	}
 	while(d = readdir(dp)){
 		if((d->d_ino != 0) && (strcmp(d->d_name, ".") != 0) && (strcmp(d->d_name, "..") != 0)){
 			int i = 0;
 			for(i; i < indents; i++)
-				printf("\t");
-			//printf("%s\n", d->d_name);
-			struct stat statbuf;
-			stat(d->d_name, &statbuf);
+				printf("  ");
+			printf("%s\n", d->d_name);
+			if(!strcmp(d->d_name, target)){
+				printf("Found file %s at path %s\n", target, path);
+				exit(0);
+			}
+			int pathlen = strlen(path);
+			int dirlen = strlen(d->d_name);
+			char wholepath[pathlen+dirlen+1];
+			strcpy(wholepath, path);
+			strcat(wholepath, "/");
+			strcat(wholepath, d->d_name);
+			stat(wholepath, &statbuf);
 			if(S_ISDIR(statbuf.st_mode)){
-				int pathlen = strlen(path);
-				int dirlen = strlen(d->d_name);
-				char newpath[pathlen+dirlen+1];
-				strcpy(newpath, path);
-				strcat(newpath, "/");
-				strcat(newpath, d->d_name);
-
-				printf("%s\n", d->d_name);
-				dfs(newpath, target);
+				//printf("%s\n", d->d_name);
+				dfs(wholepath, target);
 			}
 		}
 	}
