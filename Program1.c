@@ -4,17 +4,22 @@
 #include <fcntl.h>
 #include <string.h>
 #include <errno.h>
+#include <stdlib.h>
+#include <unistd.h>
 //Read file given by path, 
 // Print out odd lines and then even lines
 
-//Can use the following commands: open, lseek, read, close
 
 int main(int argc, const char *argv[]){
 	char buffer[2048];
 	int lineNum=0;
-	int i, j;
+	int i, j, closeFile, filedesc;
 	char bufferTwo[1];
+	size_t readBuff;
+	size_t writeLine;
 
+	const char *path;
+	path = argv[1];
 	//open file
 	filedesc = open(path, O_RDONLY);
 	//check for errors
@@ -42,28 +47,32 @@ int main(int argc, const char *argv[]){
 
 
 			if(buffer[i] == '\n'){
-	
 				lineNum++;
 			}
 
 			if(buffer[i] == EOF){
-
 				exit(EXIT_SUCCESS);
 			}
 		}
+
 		else {
 			if(buffer[i] == '\n'){
 				lineNum++;
 			}
 		}
+
+		
 	}
+	
 
 	i=0; 
 	lineNum = 0;
+	bufferTwo[0] = '\n';
+	write(1, bufferTwo, 1);
 	for(i=0; i < readBuff; i++){
-		if((line_number % 2) == 1){
+		if((lineNum % 2) == 1){
 			bufferTwo[0] = buffer[i];
-			writeLine = write(1, char_buffer, 1);
+			writeLine = write(1, bufferTwo, 1);
 			if(writeLine == -1){
 				printf("Error: %s\n", strerror(errno));
 				exit(EXIT_FAILURE);
@@ -82,8 +91,8 @@ int main(int argc, const char *argv[]){
 		}
 	}
 
-	close = close(filedesc);
-	if(close == -1){
+	closeFile = close(filedesc);
+	if(closeFile == -1){
 		printf("Error: %s\n", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
