@@ -1,99 +1,96 @@
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 //Read file given by path, 
 // Print out odd lines and then even lines
 
 
 int main(int argc, char *argv[]){
-	char buffer[2048];
-	int lineNum=0;
-	int i, j, closeFile, filedesc;
-	char bufferTwo[1];
+	char buffer[2048], bufferTwo[256], *path;
 	size_t readBuff, writeLine;
-	char *path;
-	
+	int i, j, closeFile, filedesc, lineNum=0;
+
+	//open up the path
 	path = argv[1];
-	
+
 	//open file
 	filedesc = open(path, O_RDONLY);
-	//check for errors
-	if(filedesc == -1){
-		printf("Error: %s\n", strerror(errno));
+	if(filedesc == -1){ //error checking
+		printf("Error is: %s\n", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
 	readBuff = read(filedesc, buffer, sizeof(buffer));
-	//check for errors
-	if(readBuff == -1){
-		printf("Error: %s\n", strerror(errno));
+	if(readBuff == -1){ //error checking
+		printf("Error is: %s\n", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 	
-	for(i=0; i < readBuff; i++){
-		if((lineNum % 2) == 0){
+	for(i=0; i < readBuff; i++){ //first loop for odd numbered lines
+		if((lineNum % 2) == 0){ //odd numbered lines
 			bufferTwo[0] = buffer[i];
-			writeLine = write(1,bufferTwo, 1);
 
-			if(writeLine == -1){
-				printf("Error: %s\n", strerror(errno));
+			writeLine = write(1,bufferTwo, 1);
+			if(writeLine == -1){ //error checking
+				printf("Error is: %s\n", strerror(errno));
 				exit(EXIT_FAILURE);
 			}
-
-
-			if(buffer[i] == '\n'){
+			
+			else if(buffer[i] == '\n'){
 				lineNum++;
 			}
 
-			if(buffer[i] == EOF){
+			else if(buffer[i] == EOF){
 				exit(EXIT_SUCCESS);
 			}
 		}
-
-		else {
+		else { //even numbered lines, skip them
 			if(buffer[i] == '\n'){
 				lineNum++;
 			}
 		}
 
-		
 	}
 	
 
-	i=0; 
-	lineNum = 0;
-	bufferTwo[0] = '\n';
-	write(1, bufferTwo, 1);
-	for(i=0; i < readBuff; i++){
+	lineNum = 0; //reset lineNum
+	bufferTwo[0] = '\n'; //add a newline
+	write(1, bufferTwo, 1); //write this newline
+
+	for(j=0; j < readBuff; j++){ //second loop for even numbered lines
 		if((lineNum % 2) == 1){
-			bufferTwo[0] = buffer[i];
+			bufferTwo[0] = buffer[j];
+
 			writeLine = write(1, bufferTwo, 1);
-			if(writeLine == -1){
-				printf("Error: %s\n", strerror(errno));
+			if(writeLine == -1){ //error checking
+				printf("Error is: %s\n", strerror(errno));
 				exit(EXIT_FAILURE);
 			}
-			if(buffer[i] == '\n'){
+
+			else if(buffer[j] == '\n'){
 				lineNum++;
 			}
-			if(buffer[i] == EOF){
+			else if(buffer[j] == EOF){
 				exit(EXIT_SUCCESS);
 			}
 		}
-		else {
-			if(buffer[i]=='\n'){
+
+		else { //odd number lines, skip them
+			if(buffer[j]=='\n'){
 				lineNum++;
 			}
 		}
 	}
 
 	closeFile = close(filedesc);
-	if(closeFile == -1){
-		printf("Error: %s\n", strerror(errno));
+	if(closeFile == -1){ //error checking
+		printf("Error is: %s\n", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
