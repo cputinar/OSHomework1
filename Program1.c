@@ -10,16 +10,16 @@
 // Print out odd lines and then even lines
 
 
-int main(int argc, const char *argv[]){
+int main(int argc, char *argv[]){
 	char buffer[2048];
 	int lineNum=0;
 	int i, j, closeFile, filedesc;
 	char bufferTwo[1];
-	size_t readBuff;
-	size_t writeLine;
-
-	const char *path;
+	size_t readBuff, writeLine;
+	char *path;
+	
 	path = argv[1];
+	
 	//open file
 	filedesc = open(path, O_RDONLY);
 	//check for errors
