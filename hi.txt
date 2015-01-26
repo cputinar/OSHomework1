@@ -1,9 +1,0 @@
-hi
-even
-hi
-odd
-every
-other
-line
-like
-this

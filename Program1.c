@@ -34,19 +34,19 @@ int main(int argc, char *argv[]){
 	
 	for(i=0; i < readBuff; i++){ //first loop for odd numbered lines
 		if((lineNum % 2) == 0){ //odd numbered lines
-			bufferTwo[0] = buffer[i];
+			bufferTwo[0] = buffer[i]; //move line to second buffer
 
-			writeLine = write(1,bufferTwo, 1);
-			if(writeLine == -1){ //error checking
+			writeLine = write(1,bufferTwo, 1); //write this
+			if(writeLine == -1){ //error checking for write
 				printf("Error is: %s\n", strerror(errno));
 				exit(EXIT_FAILURE);
 			}
 			
-			else if(buffer[i] == '\n'){
+			else if(buffer[i] == '\n'){ 
 				lineNum++;
 			}
 
-			else if(buffer[i] == EOF){
+			else if(buffer[i] == EOF){ //reaches end of file, exit
 				exit(EXIT_SUCCESS);
 			}
 		}
@@ -63,6 +63,7 @@ int main(int argc, char *argv[]){
 	bufferTwo[0] = '\n'; //add a newline
 	write(1, bufferTwo, 1); //write this newline
 
+
 	for(j=0; j < readBuff; j++){ //second loop for even numbered lines
 		if((lineNum % 2) == 1){
 			bufferTwo[0] = buffer[j];
@@ -76,7 +77,7 @@ int main(int argc, char *argv[]){
 			else if(buffer[j] == '\n'){
 				lineNum++;
 			}
-			else if(buffer[j] == EOF){
+			else if(buffer[j] == EOF){ //reaches end of file, exit
 				exit(EXIT_SUCCESS);
 			}
 		}
@@ -88,12 +89,16 @@ int main(int argc, char *argv[]){
 		}
 	}
 
+	//close the file
 	closeFile = close(filedesc);
 	if(closeFile == -1){ //error checking
 		printf("Error is: %s\n", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
+	//program exits successfully
 	exit(EXIT_SUCCESS);
 }
+
+
 
