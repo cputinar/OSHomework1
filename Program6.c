@@ -117,10 +117,20 @@ void first_node(int n){
 		}
 	}
 }
-int main(){
+int main(int argc, char **argv){
 	pid_t pid;
 	int depth;
-	scanf("%d",&depth);
+	if(argc != 2)
+	{
+		perror("Wrong amount of arguments: Use \"$program6 depth\" to run program\n");
+		exit(1);
+	}
+	depth = atoi(argv[1]);
+	if(depth < 1)
+	{
+		perror("Invalid parameter depth. Did you enter a number greater than 0?\n");
+		exit(1);
+	}
 	if((pid = fork()) == -1)
 	{
 		perror("Fork failed in node 1");
