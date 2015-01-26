@@ -8,18 +8,20 @@
 #include <math.h>
 #include <sys/wait.h>
 
-void process_tree(int rem, int c, pid_t* pidtree)
+void process_tree(int rem, int c, int finalnum, pid_t* pidtree)
 {
-	pid_t pid1,pid2;
+	pid_t pid1,pid2,wpid;
     if(rem == 0)
     {
-    	if(c == (sizeof(pidtree)))
+    	if(c == finalnum)
     	{
     		kill(pidtree[0],SIGCONT);
     	}
-    	pause();//Wait until awaken_tree called
+    	//kill(getpid(),SIGSTOP);//Wait until awaken_tree called
+    	sleep(c);
 		printf("I am process %d, my process identifier is %ld\n",c,((long)getpid()));
-		kill((getppid()), SIGCONT);
+		sleep(finalnum-c);
+		printf("Killing process %d, my process identifier is %ld\n",c,((long)getpid()));
 		exit(0);// Kill self upon signalling parent
     }
 	pidtree[c-1]=getpid();
@@ -30,7 +32,11 @@ void process_tree(int rem, int c, pid_t* pidtree)
 		exit(1);
 	}
 	if(pid1 == 0)
-	{//Is Child
+	{//1st Child
+		process_tree(rem-1,(c*2),finalnum, pidtree);
+	}
+	else
+	{//Parent
 		if((pid2 = fork()) == -1)
 		{
 		printf("%d:",c );
@@ -38,50 +44,42 @@ void process_tree(int rem, int c, pid_t* pidtree)
 		exit(1);
 		}
 		if(pid2 == 0)
-		{//Granchild
-			process_tree(rem-1,((c*2)+1), pidtree);
+		{//2nd child
+			process_tree(rem-1,((c*2)+1),finalnum, pidtree);
 		}
 		else
-		{//Child
-			process_tree(rem-1,(c*2), pidtree);
+		{//Parent
+			//kill(getpid(),SIGSTOP);//Wait until awaken_tree called
+			sleep(c);
+			printf("I am process %d, my process identifier is %ld\n",c,((long)getpid()));
+			while((wpid = wait(NULL)) > 0);//Wait for all children to die
+			{
+				sleep(1);
+			}
+			printf("Killing process %d, my process identifier is %ld\n",c,((long)getpid()));
+			exit(0);// Kill self upon signalling parent
 		}
-	}
-	else
-	{//Parent
-		pause();//Wait until awaken_tree called
-		printf("I am process %d, my process identifier is %ld\n",c,((long)getpid()));
-		pause();// Wait for both children to signal their death
-		pause();
-		kill((getppid()), SIGCONT);
-		exit(0);// Kill self upon signalling parent
 	}
 
 }
 
-void awaken_tree(pid_t* pidtree)
+void awaken_tree(pid_t* pidtree, int finalnum)
 {
 	int i;
-	for(i=1;i<(sizeof(pidtree));i++)
+	kill(pidtree[1],SIGCONT);
+	/*for(i=1;i<finalnum;i++)
 	{
 		kill(pidtree[i],SIGCONT);
-	}
+		sleep(1);
+	}*/
 }
 
 
 void first_node(int n){
-	printf("asdasdas12312312\n");
-	pid_t pid1,pid2;
-	printf("shit\n");
+	pid_t pid1,pid2, wpid,*pidtree;
 	double height = (double)n + 1;//Figure out height of tree based on the max depth
-	printf("YO!\n");
-	printf("Height: %lf",height);
-	printf("what\n");
-	double testpow= pow(2,3);
-	printf("Height: %lf",testpow);
-	//int finalnum = (int)((pow(2.0,height))-1.0);//Calculate number of nodes in tree
-	//printf("Finalnum: %d",finalnum);
-	pid_t* pidtree = (pid_t*) malloc(3);//Allocate enough data to hold entire tree
-	printf("PID Size: %lu",(sizeof(pidtree)));
+	int finalnum = (int)((pow(2.0,height))-1.0);//Calculate number of nodes in tree
+	pidtree = malloc(finalnum*sizeof(*pidtree));//Allocate enough data to hold entire tree
 	//printf("I am process %d, my process identifier is %ld\n", c, ((long)getpid()));
 	pidtree[0]=getpid();
 	if((pid1 = fork()) == -1)
@@ -90,38 +88,51 @@ void first_node(int n){
 		exit(1);
 	}
 	if(pid1 == 0)
-	{//Is Child
+	{//Is 1st Child
+		process_tree(n-1,2,finalnum, pidtree);
+	}
+	else
+	{//Parent
 		if((pid2 = fork()) == -1)
 		{
 		perror("Fork failed in node 2");
 		exit(1);
 		}
 		if(pid2 == 0)
-		{//Granchild
-			process_tree(n-1,3, pidtree);
+		{//Is 2nd Child
+			process_tree(n-1,3,finalnum, pidtree);
 		}
 		else
-		{//Child
-			process_tree(n-1,2, pidtree);
+		{//Parent
+			//kill(getpid(),SIGSTOP);//Wait until the final node is created and signals original ancestor
+			sleep(1);
+			printf("I am process 1, my process identifier is %ld\n",((long)getpid()));
+			//awaken_tree(pidtree, finalnum);
+			while((wpid = wait(NULL)) > 0);//Wait for all children to die
+			{
+				sleep(1);
+			}
+			printf("The tree has been dismantled. It ends with me process 1, pid: %ld\n",((long)getpid()));
+			exit(0);
 		}
 	}
-	else
-	{//Parent
-		pause();//Wait until the final node is created and signals original ancestor
-		sleep(5);//Gives all the processes time to finish forking
-		printf("I am process 1, my process identifier is %ld\n",((long)getpid()));
-		awaken_tree(pidtree);
-		pause();
-		pause();
-		printf("The tree has been extinguished. It ends with me\n");
-		exit(0);
-	}	
 }
 int main(){
+	pid_t pid;
 	int depth;
-	printf("ADASD\n");
 	scanf("%d",&depth);
-	printf("fuck\n");
-	first_node(depth);
+	if((pid = fork()) == -1)
+	{
+		perror("Fork failed in node 1");
+		exit(1);
+	}
+	if(pid == 0)
+	{
+		first_node(depth);
+	}
+	else
+	{
+		wait(NULL);
+	}
 	return(0);
 }
