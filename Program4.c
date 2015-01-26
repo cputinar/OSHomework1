@@ -1,12 +1,13 @@
 #include <signal.h>
-#include <uninstd.h>
+#include <unistd.h>
 #include <stdio.h>
+
+int count = 0;
 
 int main(){
 
 	static struct sigaction act;
-	int count = 0;
-	pid_t pid, ppid;
+	pid_t pid, pid2, ppid;
 
 	void catchint(int);
 	act.sa_handler = catchint;
@@ -16,7 +17,7 @@ int main(){
 	ppid = getpid();
 	pid = fork();
 	if(pid != 0)
-		pid = fork();
+		pid2 = fork();
 
 	if(ppid != getpid()){
 		while(1){
@@ -24,13 +25,15 @@ int main(){
 		}
 	}
 	else{
-		for(int i = 0; i < 5; i++){
+		int i = 0;
+		for(i; i < 5; i++){
 			sleep(1);
-			kill(pid1, SIGALRM);
+			kill(pid, SIGALRM);
 			kill(pid2, SIGALRM);
 
 		}		
-	}		
+	}
+	return 0;		
 }
 
 void catchint(int sig){
